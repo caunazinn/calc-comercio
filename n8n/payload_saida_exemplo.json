@@ -1,0 +1,65 @@
+{
+  "_comentario": "Resposta que o Python retorna ao n8n após o cálculo (HTTP 200 OK)",
+  "_instrucao_n8n": "Use {{ $json.mensagem_telegram }} no nó 'Send Message' do Telegram com parse_mode=Markdown",
+
+  "sucesso": true,
+
+  "mensagem_telegram": "🧮 *CALCULADORA DE SOBREVIVÊNCIA*\n`────────────────────────────────`\n💳 *Pagamento:* Crédito à Vista (1x)\n🏪 *Atividade MEI:* Comércio\n`────────────────────────────────`\n📦 *Custo do produto:*    R$ 85.00\n📊 *DAS-MEI diluído:*     R$ 1.92 (1.4%)\n💳 *Taxa maquininha (2.99%):* R$ 4.19\n🏠 *Despesas fixas:*      R$ 7.01\n`────────────────────────────────`\n💰 *PREÇO DE VENDA:* R$ 140.17\n✅ *Lucro real:*     R$ 42.05 (30.0%)\n📈 *Margem de Contribuição:* 35.0%\n`────────────────────────────────`\n_Calculado pela Calculadora de Sobrevivência_ 🚀",
+
+  "preco_venda_sugerido": 140.17,
+  "lucro_real_valor": 42.05,
+  "lucro_real_percentual": 30.0,
+  "margem_contribuicao_pct": 35.0,
+  "taxa_maquininha_percentual": 2.99,
+  "das_mei_unitario": 1.92,
+
+  "detalhamento": {
+    "custo_base": 85.00,
+    "das_unitario": 1.92,
+    "custo_total_antes_markup": 86.92,
+    "markup_divisor": 0.6201,
+    "taxa_maquininha_pct": 2.99,
+    "despesas_fixas_pct": 5.0,
+    "margem_lucro_desejada_pct": 30.0,
+    "das_mensal_total": 76.90,
+    "vendas_mensais_estimadas": 40
+  },
+
+  "_cenarios_comparativos": {
+    "_comentario": "Exemplos de como o preço muda conforme o meio de pagamento",
+    "pix_ou_dinheiro": {
+      "taxa": "0%",
+      "preco_estimado": 130.65,
+      "lucro": 39.19
+    },
+    "debito": {
+      "taxa": "1.5%",
+      "preco_estimado": 134.11,
+      "lucro": 40.23
+    },
+    "credito_vista": {
+      "taxa": "2.99%",
+      "preco_estimado": 140.17,
+      "lucro": 42.05
+    },
+    "credito_2a6": {
+      "taxa": "3.89%",
+      "preco_estimado": 143.73,
+      "lucro": 43.12
+    },
+    "credito_7a12": {
+      "taxa": "4.99%",
+      "preco_estimado": 149.05,
+      "lucro": 44.72
+    }
+  },
+
+  "_fluxo_n8n_recomendado": {
+    "passo_1": "Telegram Trigger — recebe /calcular do usuário",
+    "passo_2": "Nó de conversação (pergunta custo, margem, pagamento, vendas/mês, tipo MEI)",
+    "passo_3": "HTTP Request POST /calcular — envia payload com dados coletados",
+    "passo_4": "IF node — checa {{ $json.sucesso }} == true",
+    "passo_5_sucesso": "Send Message — envia {{ $json.mensagem_telegram }} com parse_mode=Markdown",
+    "passo_5_erro": "Send Message — envia {{ $json.detail.mensagem_usuario }} ao usuário"
+  }
+}

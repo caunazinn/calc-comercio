@@ -1,0 +1,17 @@
+# Motor de API
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+
+# Validação de dados
+pydantic==2.7.1
+
+# Google Sheets
+gspread==6.1.2
+google-auth==2.29.0
+
+# Variáveis de ambiente
+python-dotenv==1.0.1
+
+# Testes
+pytest==8.2.0
+pytest-cov==5.0.0

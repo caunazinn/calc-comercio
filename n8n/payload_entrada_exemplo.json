@@ -1,0 +1,36 @@
+{
+  "_comentario": "Payload que o n8n envia via HTTP Request (POST) para http://SEU_SERVIDOR:8000/calcular",
+  "_descricao": "Dados coletados do empreendedor pelo bot do Telegram via conversação guiada",
+
+  "custo_produto": 85.00,
+  "margem_lucro_desejada": 30,
+  "tipo_pagamento": "credito_vista",
+  "despesas_fixas_percentual": 5.0,
+  "vendas_mensais_estimadas": 40,
+  "tipo_mei": "comercio",
+  "taxa_maquininha_override": null,
+
+  "_tipos_pagamento_disponiveis": {
+    "pix":           "PIX — taxa 0%",
+    "dinheiro":      "Dinheiro — taxa 0%",
+    "debito":        "Débito — taxa ~1.5%",
+    "credito_vista": "Crédito à Vista (1x) — taxa ~2.99%",
+    "credito_2a6":   "Crédito Parcelado 2–6x — taxa ~3.89%",
+    "credito_7a12":  "Crédito Parcelado 7–12x — taxa ~4.99%"
+  },
+
+  "_tipos_mei_disponiveis": {
+    "comercio": "Comércio — DAS R$ 76,90/mês (2025)",
+    "servicos": "Serviços — DAS R$ 80,90/mês (2025)",
+    "ambos":    "Comércio + Serviços — DAS R$ 81,90/mês (2025)"
+  },
+
+  "_configuracao_n8n": {
+    "metodo": "POST",
+    "url": "http://localhost:8000/calcular",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "como_montar_body": "No n8n, use Expression para mapear as variáveis coletadas do usuário: {{ $json.custo_produto }}, etc."
+  }
+}
