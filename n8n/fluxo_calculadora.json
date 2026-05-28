@@ -1,0 +1,312 @@
+{
+  "name": "Calculadora de Sobrevivência - Bot Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ⚙️ SETUP — leia antes de ativar\n\n**1. Credenciais Telegram**\nCrie em: Configurações → Credenciais → Telegram API\nToken: obtido via @BotFather no Telegram\n\n**2. Variável de ambiente da API**\nEm: Configurações → Variáveis\nNome: `API_URL`\nValor: URL do seu servidor Python (ex: https://calculadora.up.railway.app)\n\n**3. Ativar o workflow**\nClique no toggle no canto superior direito.",
+        "height": 280,
+        "width": 460,
+        "color": 4
+      },
+      "id": "00000000-0000-4000-a000-000000000001",
+      "name": "📋 Instruções de Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, -320]
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "00000000-0000-4000-a000-000000000002",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [180, 300],
+      "webhookId": "00000000-0000-4000-a000-000000000099",
+      "credentials": {
+        "telegramApi": {
+          "id": "SUBSTITUA_PELO_ID_DA_CREDENCIAL",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai os dados da mensagem recebida do Telegram\nconst update = $input.first().json;\nconst message = update.message || update.edited_message;\n\nif (!message || !message.text) {\n  return [];\n}\n\nconst chatId = String(message.chat.id);\nconst text = message.text.trim();\nconst firstName = message.from?.first_name || 'empreendedor';\n\nreturn [{ json: { chatId, text, firstName } }];"
+      },
+      "id": "00000000-0000-4000-a000-000000000003",
+      "name": "Extrair Mensagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "cond-start",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "/start",
+              "operator": { "type": "string", "operation": "startsWith" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-a000-000000000004",
+      "name": "É /start?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [620, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ '🚀 Olá, ' + $json.firstName + '!\\n\\nSou a *Calculadora de Sobrevivência* — seu consultor financeiro no bolso.\\n\\nEu calculo o *preço de venda real* do seu produto em segundos, embutindo automaticamente:\\n• Taxa da maquininha\\n• Imposto DAS-MEI\\n• Suas despesas fixas\\n\\nDigite /calcular para começar!' }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "00000000-0000-4000-a000-000000000005",
+      "name": "Enviar Boas-vindas",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [840, 120],
+      "credentials": {
+        "telegramApi": {
+          "id": "SUBSTITUA_PELO_ID_DA_CREDENCIAL",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "cond-calcular",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "/calcular",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-a000-000000000006",
+      "name": "É /calcular?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [840, 460]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "📊 *Como calcular seu preço*\n\nEnvie uma mensagem com os dados abaixo.\nUse exatamente este formato:\n\n```\ncusto: 85\nmargem: 30\npagamento: credito_vista\nfixas: 5\nvendas: 40\nmei: comercio\n```\n\n*Tipos de pagamento disponíveis:*\n`pix` • `dinheiro` • `debito`\n`credito_vista` • `credito_2a6` • `credito_7a12`\n\n*Tipos de MEI:*\n`comercio` • `servicos` • `ambos`\n\n_fixas e vendas são opcionais (padrão: 0% e 50 unidades/mês)_",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "00000000-0000-4000-a000-000000000007",
+      "name": "Enviar Instruções",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1060, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "SUBSTITUA_PELO_ID_DA_CREDENCIAL",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "cond-dados",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "custo",
+              "operator": { "type": "string", "operation": "contains" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-a000-000000000008",
+      "name": "Tem dados de cálculo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1060, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Faz o parse dos parâmetros enviados pelo usuário\nconst text = $json.text;\nconst chatId = $json.chatId;\n\nfunction parseNum(nome) {\n  const r = new RegExp(nome + '[:\\\\s]+([\\\\d.,]+)', 'i');\n  const m = text.match(r);\n  return m ? parseFloat(m[1].replace(',', '.')) : null;\n}\n\nfunction parseTxt(nome) {\n  const r = new RegExp(nome + '[:\\\\s]+(\\\\S+)', 'i');\n  const m = text.match(r);\n  return m ? m[1].toLowerCase().trim() : null;\n}\n\nconst custo    = parseNum('custo');\nconst margem   = parseNum('margem');\nconst pagamento = parseTxt('pagamento') || parseTxt('pag');\nconst fixas    = parseNum('fixas') ?? 0;\nconst vendas   = Math.round(parseNum('vendas') ?? 50);\nconst mei      = parseTxt('mei') || 'comercio';\n\nconst tiposValidos = ['pix','dinheiro','debito','credito_vista','credito_2a6','credito_7a12'];\nconst meiValidos   = ['comercio','servicos','ambos'];\n\nif (!custo || custo <= 0)\n  throw new Error('❌ Custo inválido. Exemplo: custo: 85');\nif (!margem || margem <= 0 || margem >= 100)\n  throw new Error('❌ Margem inválida (use % entre 1 e 99). Exemplo: margem: 30');\nif (!pagamento || !tiposValidos.includes(pagamento))\n  throw new Error('❌ Pagamento inválido. Use um de: ' + tiposValidos.join(', '));\nif (!meiValidos.includes(mei))\n  throw new Error('❌ MEI inválido. Use: ' + meiValidos.join(', '));\n\nreturn [{ json: {\n  chatId,\n  payload: {\n    custo_produto: custo,\n    margem_lucro_desejada: margem,\n    tipo_pagamento: pagamento,\n    despesas_fixas_percentual: fixas,\n    vendas_mensais_estimadas: vendas,\n    tipo_mei: mei\n  }\n}}];"
+      },
+      "id": "00000000-0000-4000-a000-000000000009",
+      "name": "Analisar Parâmetros",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1280, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_URL }}/calcular",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "00000000-0000-4000-a000-000000000010",
+      "name": "Chamar API Calculadora",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1500, 500]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "id": "cond-sucesso",
+              "leftValue": "={{ $json.sucesso }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-a000-000000000011",
+      "name": "Cálculo OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1720, 500]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Analisar Parâmetros').item.json.chatId }}",
+        "text": "={{ $json.mensagem_telegram }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "00000000-0000-4000-a000-000000000012",
+      "name": "Enviar Resultado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1940, 380],
+      "credentials": {
+        "telegramApi": {
+          "id": "SUBSTITUA_PELO_ID_DA_CREDENCIAL",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Analisar Parâmetros').item.json.chatId }}",
+        "text": "⚠️ *Erro no cálculo*\n\nNão consegui processar os dados. Verifique o formato e tente novamente.\n\nDigite /calcular para ver o formato correto.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "00000000-0000-4000-a000-000000000013",
+      "name": "Enviar Erro de API",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1940, 620],
+      "credentials": {
+        "telegramApi": {
+          "id": "SUBSTITUA_PELO_ID_DA_CREDENCIAL",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "Não entendi 🤔\n\nComandos disponíveis:\n/start — apresentação\n/calcular — calcular preço de venda",
+        "additionalFields": {}
+      },
+      "id": "00000000-0000-4000-a000-000000000014",
+      "name": "Enviar Ajuda",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1280, 720],
+      "credentials": {
+        "telegramApi": {
+          "id": "SUBSTITUA_PELO_ID_DA_CREDENCIAL",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Extrair Mensagem", "type": "main", "index": 0 }]]
+    },
+    "Extrair Mensagem": {
+      "main": [[{ "node": "É /start?", "type": "main", "index": 0 }]]
+    },
+    "É /start?": {
+      "main": [
+        [{ "node": "Enviar Boas-vindas", "type": "main", "index": 0 }],
+        [{ "node": "É /calcular?", "type": "main", "index": 0 }]
+      ]
+    },
+    "É /calcular?": {
+      "main": [
+        [{ "node": "Enviar Instruções", "type": "main", "index": 0 }],
+        [{ "node": "Tem dados de cálculo?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Tem dados de cálculo?": {
+      "main": [
+        [{ "node": "Analisar Parâmetros", "type": "main", "index": 0 }],
+        [{ "node": "Enviar Ajuda", "type": "main", "index": 0 }]
+      ]
+    },
+    "Analisar Parâmetros": {
+      "main": [[{ "node": "Chamar API Calculadora", "type": "main", "index": 0 }]]
+    },
+    "Chamar API Calculadora": {
+      "main": [[{ "node": "Cálculo OK?", "type": "main", "index": 0 }]]
+    },
+    "Cálculo OK?": {
+      "main": [
+        [{ "node": "Enviar Resultado", "type": "main", "index": 0 }],
+        [{ "node": "Enviar Erro de API", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": { "templateCredsSetupCompleted": false },
+  "pinData": {}
+}
