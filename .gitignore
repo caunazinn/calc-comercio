@@ -1,7 +1,6 @@
 # Credenciais — NUNCA subir no GitHub
 .env
-credentials/service_account.json
-credentials/*.json
+
 
 # Python
 __pycache__/
